@@ -1,0 +1,67 @@
+language: none
+
+services:
+  - couchdb #2.2.0
+  - elasticsearch #6.4.3
+  - memcached #1.5.12
+  - mongodb #4.0.3
+  - mysql #5.7.24
+  - postgres #10.6
+  - rabbitmq #3.6.15
+  - redis #5.0.0 
+  - riak #2.2.3
+  - selenium #3.141.5
+  - sqlite #3.22.0
+ 
+runtime:
+  - nodePool: default_node_pool
+  - nodePool: dynamic__x86_64__CentOS_7__c4_large
+  - nodePool: dynamic__x86_64__Ubuntu_14_04__c4_large
+
+matrix:
+  allow_failures:
+    - nodePool: dynamic__x86_64__CentOS_7__c4_large
+    
+build:
+  pre_ci_boot:
+    image_name: drydock/u16all
+    image_tag: master
+    pull: true
+    
+  ci:
+    - echo SHIPPABLE_COUCHDB_BINARY=$SHIPPABLE_COUCHDB_BINARY
+    - echo SHIPPABLE_ES_BINARY=$SHIPPABLE_ES_BINARY
+    - echo SHIPPABLE_MEMCACHED_BINARY=$SHIPPABLE_MEMCACHED_BINARY
+    - echo SHIPPABLE_MONGODB_BINARY=$SHIPPABLE_MONGODB_BINARY
+    - echo SHIPPABLE_MYSQL_BINARY=$SHIPPABLE_MYSQL_BINARY
+    - echo SHIPPABLE_POSTGRES_BINARY=$SHIPPABLE_POSTGRES_BINARY
+    - echo SHIPPABLE_RABBITMQ_BINARY=$SHIPPABLE_RABBITMQ_BINARY
+    - echo SHIPPABLE_REDIS_BINARY=$SHIPPABLE_REDIS_BINARY
+    - echo SHIPPABLE_SELENIUM_v=$SHIPPABLE_SELENIUM_BINARY    
+    - echo SHIPPABLE_SQLITE_BINARY=$SHIPPABLE_SQLITE_BINARY
+
+    - memcached -V
+    - riak version
+    - which mysql
+    - mysql -V #|| true
+    - which sqlite3 #|| true
+    - java -jar /usr/local/selenium/selenium-server-standalone-3.141.5.jar --version
+    - sqlite3 --version
+    - psql --version
+    - redis-server --version
+    - dpkg -s rabbitmq-server | grep Version
+    #- yum list rabbitmq-server | grep rabbitmq-serve #for c7all rabbitmq version
+    - mongod --version
+    - elasticsearch --version
+    - sleep 5
+    - curl http://127.0.0.1:5984
+    - pip show pycrypto
+    
+    - docker pull shippabledocker/sample_node_pvt:ecr
+    
+integrations:
+    
+  hub:
+ #Docker integration
+    - integrationName: ship-docker
+      type: dockerRegistryLogin
