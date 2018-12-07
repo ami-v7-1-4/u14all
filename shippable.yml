@@ -14,17 +14,11 @@ services:
   - sqlite #3.22.0
  
 runtime:
-  - nodePool: default_node_pool
-  - nodePool: dynamic__x86_64__CentOS_7__c4_large
   - nodePool: dynamic__x86_64__Ubuntu_14_04__c4_large
-
-matrix:
-  allow_failures:
-    - nodePool: dynamic__x86_64__CentOS_7__c4_large
     
 build:
   pre_ci_boot:
-    image_name: drydock/u16all
+    image_name: drydock/u14all
     image_tag: master
     pull: true
     
